@@ -1,4 +1,5 @@
 import platform
+import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -41,7 +42,7 @@ target_page = "https://uk.webuy.com/user/account?tab=favourites&page=1&sortBy=mo
 driver.get(target_page)
 WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "cx-account-card-grid")))
 product_on_page = driver.find_elements(By.XPATH, "//a[contains(@class, 'line-clamp')]")
-product_links = [item.get_attribute("outerHTML") for item in product_on_page]
+product_links = [[item.text, item.get_attribute("href")] for item in product_on_page]
 max_pages = int(driver.find_elements(By.XPATH, "//ul/li/span[@class='page-link']")[-1].text)
 
 if max_pages > 1:
@@ -49,9 +50,10 @@ if max_pages > 1:
         driver.get(f"https://uk.webuy.com/user/account?tab=favourites&page={i}&sortBy=most-recent")
         WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "cx-account-card-grid")))
         product_on_page = driver.find_elements(By.XPATH, "//a[contains(@class, 'line-clamp')]")
-        product_links.extend([item.get_attribute("outerHTML") for item in product_on_page])
+        product_links.extend([[item.text, item.get_attribute("href")] for item in product_on_page])
 
-for p in product_links:
-    print(p)
+with open("data/favourites.csv", "w", newline='') as f:
+    favourites_writer = csv.writer(f)
+    favourites_writer.writerows(product_links)
 
 driver.quit()
