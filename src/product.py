@@ -15,7 +15,6 @@ def check_element_presence(driver, locator, timeout=3):
 
 with open("data/stores.txt") as f:
     local_stores = f.read().splitlines()
-    print(local_stores)
 
 with open("data/favourites.csv") as f:
     favourites_writer = csv.reader(f)
@@ -30,12 +29,14 @@ if check_element_presence(driver, locate_cookie_popup):
     cookie_accept = driver.find_element(*locate_cookie_popup)
     cookie_accept.click()
 
+to_write = []   
+
 for item, url in favourites_list:
     driver.get(url)
     WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.XPATH, "//span[text()='Check stock in store' or text()='Pick up unavailable']")))
     check_stock_in_store = driver.find_element(By.XPATH, "//span[text()='Check stock in store' or text()='Pick up unavailable']")
     if check_stock_in_store.text == 'Pick up unavailable':
-        print(f"{item} - Out of stock")
+        to_write.append(f"{item} - Out of stock\n")
     else:
         check_stock_in_store.click()
 
@@ -46,5 +47,13 @@ for item, url in favourites_list:
         WebDriverWait(driver, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "store-card")))
         all_stores = driver.find_elements(By.CSS_SELECTOR, "a.store-card")
         locations = [store.find_element(By.CSS_SELECTOR, "span:first-of-type").text for store in all_stores]
+        is_in_local_store = [s for s in locations if any(sub in s for sub in local_stores)]
 
-        print(f"{item} - {[s for s in locations if any(sub in s for sub in local_stores)]}")
+        if is_in_local_store:
+            available_stores_as_str = ", ".join(is_in_local_store)
+            to_write.append(f"{item} - {available_stores_as_str}\n")
+        else:
+            to_write.append(f"{item} - Not available in local stores\n")
+
+with open("data/results.txt", "w") as f:
+    f.writelines(to_write)
