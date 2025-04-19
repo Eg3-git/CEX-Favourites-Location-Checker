@@ -26,17 +26,27 @@ driver = infer_default_browser()
 
 driver.get("https://uk.webuy.com")
 WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "header-account-button")))
-locate_cookie_popup = (By.ID, "onetrust-accept-btn-handler")
+WebDriverWait(driver, 10).until(
+    lambda d: d.execute_script("""
+        const el = document.querySelector("#cmpwrapper");
+        return el && el.shadowRoot && el.shadowRoot.querySelector(".cmpboxbtn.cmpboxbtnyes.cmptxt_btn_yes");
+    """)
+)
 
-if check_element_presence(driver, locate_cookie_popup):
-    cookie_accept = driver.find_element(*locate_cookie_popup)
-    cookie_accept.click()
+shadow_button = driver.execute_script("""
+    return document
+        .querySelector("#cmpwrapper")
+        .shadowRoot
+        .querySelector(".cmpboxbtn.cmpboxbtnyes.cmptxt_btn_yes");
+""")
+
+driver.execute_script("arguments[0].click();", shadow_button)
 
 login_span = driver.find_element(By.XPATH, "//span[contains(@class, 'header-account-button')]")
 login_span.click()
 
 print("Please sign in")
-WebDriverWait(driver, 300).until(expected_conditions.url_changes(driver.current_url))
+WebDriverWait(driver, 300).until(expected_conditions.element_to_be_clickable((By.XPATH, "//a[text()='View All']")))
 
 target_page = "https://uk.webuy.com/user/account?tab=favourites&page=1&sortBy=most-recent"
 driver.get(target_page)
