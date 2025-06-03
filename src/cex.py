@@ -58,7 +58,7 @@ max_pages = int(driver.find_elements(By.XPATH, "//ul/li/span[@class='page-link']
 if max_pages > 1:
     for i in range(2, max_pages+1):
         driver.get(f"https://uk.webuy.com/user/account?tab=favourites&page={i}&sortBy=most-recent")
-        WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "cx-account-card-grid")))
+        WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "line-clamp")))
         product_on_page = driver.find_elements(By.XPATH, "//a[contains(@class, 'line-clamp')]")
         product_links.extend([[item.text, item.get_attribute("href")] for item in product_on_page])
 
