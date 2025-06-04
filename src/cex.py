@@ -1,9 +1,11 @@
 import platform
 import csv
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from dotenv import load_dotenv
 
 def infer_default_browser():
     if platform.system() == "Windows":
@@ -44,6 +46,15 @@ driver.execute_script("arguments[0].click();", shadow_button)
 
 login_span = driver.find_element(By.XPATH, "//span[contains(@class, 'header-account-button')]")
 login_span.click()
+
+load_dotenv()
+email = os.getenv("EMAIL")
+pword = os.getenv("PASSWORD")
+WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.ID, "email")))
+input_email = driver.find_element(By.ID, 'email')
+input_email.send_keys(email)
+input_pword = driver.find_element(By.ID, "password")
+input_pword.send_keys(pword)
 
 print("Please sign in")
 WebDriverWait(driver, 300).until(expected_conditions.element_to_be_clickable((By.XPATH, "//a[text()='View All']")))
