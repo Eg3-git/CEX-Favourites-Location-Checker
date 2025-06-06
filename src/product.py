@@ -1,4 +1,5 @@
 import csv
+from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -46,7 +47,7 @@ products_in_local_store = {}
 products_not_in_local_store = []
 products_out_of_stock = []
 
-for i, (item, url) in enumerate(favourites_list):
+for i, (item, url) in tqdm(enumerate(favourites_list)):
     driver.get(url)
     WebDriverWait(driver, 30).until(expected_conditions.element_to_be_clickable((By.XPATH, "//span[text()='Collect today, check store stock' or text()='Pick up unavailable']")))
     check_stock_in_store = driver.find_element(By.XPATH, "//span[text()='Collect today, check store stock' or text()='Pick up unavailable']")
