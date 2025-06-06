@@ -47,7 +47,7 @@ products_in_local_store = {}
 products_not_in_local_store = []
 products_out_of_stock = []
 
-for i, (item, url) in tqdm(enumerate(favourites_list)):
+for i, (item, url) in enumerate(tqdm(favourites_list)):
     driver.get(url)
     WebDriverWait(driver, 30).until(expected_conditions.element_to_be_clickable((By.XPATH, "//span[text()='Collect today, check store stock' or text()='Pick up unavailable']")))
     check_stock_in_store = driver.find_element(By.XPATH, "//span[text()='Collect today, check store stock' or text()='Pick up unavailable']")
@@ -96,3 +96,5 @@ to_write.extend([f"\t{item} - £{sell_price:.2f} - P{page}\n" for item, sell_pri
 
 with open("data/results.txt", "w") as f:
     f.writelines(to_write)
+
+driver.quit()
