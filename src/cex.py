@@ -1,6 +1,7 @@
 import platform
 import csv
 import os
+from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -67,7 +68,7 @@ product_links = [[item.text, item.get_attribute("href")] for item in product_on_
 max_pages = int(driver.find_elements(By.XPATH, "//ul/li/span[@class='page-link']")[-1].text)
 
 if max_pages > 1:
-    for i in range(2, max_pages+1):
+    for i in tqdm(range(2, max_pages+1)):
         driver.get(f"https://uk.webuy.com/user/account?tab=favourites&page={i}&sortBy=most-recent")
         WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "line-clamp")))
         product_on_page = driver.find_elements(By.XPATH, "//a[contains(@class, 'line-clamp')]")
